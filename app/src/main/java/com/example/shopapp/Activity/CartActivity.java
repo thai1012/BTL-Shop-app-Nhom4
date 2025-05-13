@@ -1,13 +1,10 @@
 package com.example.shopapp.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-
+import android.view.View;                       // <-- thêm import này
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.shopapp.Adapter.CartAdapter;
@@ -17,51 +14,76 @@ import com.example.shopapp.R;
 import com.example.shopapp.databinding.ActivityCartBinding;
 
 public class CartActivity extends AppCompatActivity {
-
     private ActivityCartBinding binding;
-    private double tax;
     private ManagmentCart managmentCart;
+    private double tax;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Edge-to-edge UI
         EdgeToEdge.enable(this);
-        binding=ActivityCartBinding.inflate(getLayoutInflater());
+
+        // Inflate layout via ViewBinding
+        binding = ActivityCartBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Setup management and UI
         managmentCart = new ManagmentCart(this);
-        calculatorCart();
-        setVariable();
+        setupBackButton();
+        setupCheckoutButton();
         initCartList();
+        calculateCart();
+    }
+
+    private void setupBackButton() {
+        binding.backBtn.setOnClickListener(v -> finish());
+    }
+
+    private void setupCheckoutButton() {
+        binding.btnCheckout.setOnClickListener(v -> {
+            // Launch success screen
+            startActivity(new Intent(CartActivity.this, OrderSuccessActivity.class));
+            finish();
+        });
     }
 
     private void initCartList() {
-        if(managmentCart.getListCart().isEmpty()){
+        if (managmentCart.getListCart().isEmpty()) {
             binding.emptyTxt.setVisibility(View.VISIBLE);
             binding.scrollView2.setVisibility(View.GONE);
-        }else {
+        } else {
             binding.emptyTxt.setVisibility(View.GONE);
             binding.scrollView2.setVisibility(View.VISIBLE);
         }
-
-        binding.cartView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-        binding.cartView.setAdapter(new CartAdapter(managmentCart.getListCart(), this, this::calculatorCart));
+        binding.cartView.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        );
+        binding.cartView.setAdapter(
+                new CartAdapter(
+                        managmentCart.getListCart(),
+                        this,
+                        new ChangeNumberItemsListener() {
+                            @Override
+                            public void changed() {
+                                calculateCart();
+                            }
+                        }
+                )
+        );
     }
 
-    private void setVariable() {
-        binding.backBtn.setOnClickListener(view -> finish());
-    }
-
-    private void calculatorCart(){
+    private void calculateCart() {
         double percentTax = 0.02;
-        double delivery =10;
-        tax=Math.round((managmentCart.getTotalFee()*percentTax*100.0))/100.0 ;
-        double total = Math.round((managmentCart.getTotalFee()+tax+delivery)*100.0)/100.0;
-        double itemTotal = Math.round((managmentCart.getTotalFee()*100.0))/100.0;
+        double delivery = 10;
 
-        binding.totalFeeTxt.setText("$"+itemTotal);
-        binding.taxTxt.setText("$"+delivery);
-        binding.deliveryTxt.setText("$"+delivery);
-        binding.totalTxt.setText("$"+total);
+        double subtotal = Math.round(managmentCart.getTotalFee() * 100.0) / 100.0;
+        tax = Math.round(subtotal * percentTax * 100.0) / 100.0;
+        double total = Math.round((subtotal + tax + delivery) * 100.0) / 100.0;
+
+        binding.totalFeeTxt.setText("$" + subtotal);
+        binding.taxTxt     .setText("$" + tax);
+        binding.deliveryTxt.setText("$" + delivery);
+        binding.totalTxt   .setText("$" + total);
     }
 }

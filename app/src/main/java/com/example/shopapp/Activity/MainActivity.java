@@ -1,16 +1,11 @@
 package com.example.shopapp.Activity;
 
-import static com.example.shopapp.R.*;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.CompositePageTransformer;
@@ -30,76 +25,84 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        binding=ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         viewModel = new MainViewModel();
+
         initCategory();
         initSlider();
         initPopular();
-        bottomNavigation();
+        setupBottomNavigation();
     }
 
-    private void bottomNavigation() {
-        binding.bottomNavigation.setItemSelected(R.id.home,true);
+    private void setupBottomNavigation() {
+        binding.bottomNavigation.setItemSelected(R.id.home, true);
+
         binding.bottomNavigation.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(int i) {
-
+            public void onItemSelected(int id) {
+                if (id == R.id.home) {
+                    // Đang ở MainActivity
+                } else if (id == R.id.profile) {
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                }
             }
         });
 
-        binding.cartBtn.setOnClickListener(v -> startActivity(new Intent(MainActivity.this,CartActivity.class)));
+        binding.cartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, CartActivity.class));
+            }
+        });
     }
 
     private void initPopular() {
-
         binding.progressBarPopular.setVisibility(View.VISIBLE);
-        viewModel.loadPopular().observeForever(itemsModels -> {
-            if(!itemsModels.isEmpty()){
+        viewModel.loadPopular().observe(this, itemsModels -> {
+            if (!itemsModels.isEmpty()) {
                 binding.popularView.setLayoutManager(
-                        new LinearLayoutManager(MainActivity.this,LinearLayoutManager.HORIZONTAL,false));
+                        new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
                 binding.popularView.setAdapter(new PopularAdapter(itemsModels));
                 binding.popularView.setNestedScrollingEnabled(true);
             }
             binding.progressBarPopular.setVisibility(View.GONE);
         });
-        viewModel.loadPopular();
     }
 
     private void initSlider() {
         binding.progressBarSlider.setVisibility(View.VISIBLE);
-        viewModel.loadBanner().observeForever(bannerModels -> {
-            if(bannerModels!=null&& !bannerModels.isEmpty()){
+        viewModel.loadBanner().observe(this, bannerModels -> {
+            if (bannerModels != null && !bannerModels.isEmpty()) {
                 banners(bannerModels);
-                binding.progressBarSlider.setVisibility(View.GONE);
             }
+            binding.progressBarSlider.setVisibility(View.GONE);
         });
-
-        viewModel.loadBanner();
     }
 
     private void banners(ArrayList<BannerModel> bannerModels) {
-        binding.viewPagerSlider.setAdapter(new SliderAdapter(bannerModels,binding.viewPagerSlider));
+        binding.viewPagerSlider.setAdapter(new SliderAdapter(bannerModels, binding.viewPagerSlider));
         binding.viewPagerSlider.setClipToPadding(false);
         binding.viewPagerSlider.setClipChildren(false);
         binding.viewPagerSlider.setOffscreenPageLimit(3);
         binding.viewPagerSlider.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
 
-        CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
-        compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-
-        binding.viewPagerSlider.setPageTransformer(compositePageTransformer);
+        CompositePageTransformer transformer = new CompositePageTransformer();
+        transformer.addTransformer(new MarginPageTransformer(40));
+        binding.viewPagerSlider.setPageTransformer(transformer);
     }
 
     private void initCategory() {
         binding.progressCategory.setVisibility(View.VISIBLE);
-        viewModel.loadCategory().observeForever(categoryModels -> {
+        viewModel.loadCategory().observe(this, categoryModels -> {
             binding.categoryView.setLayoutManager(new LinearLayoutManager(
-                    MainActivity.this,LinearLayoutManager.HORIZONTAL,false));
+                    MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
             binding.categoryView.setAdapter(new CategoryAdapter(categoryModels));
             binding.categoryView.setNestedScrollingEnabled(true);
             binding.progressCategory.setVisibility(View.GONE);
