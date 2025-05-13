@@ -9,19 +9,39 @@
     android:background="@color/lightGrey"
     tools:context=".Activity.CartActivity">
 
-    <!-- Empty state -->
-    <TextView
-        android:id="@+id/emptyTxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Your Cart Is Empty"
+    <!-- Layout khi giỏ hàng trống -->
+    <LinearLayout
+        android:id="@+id/emptyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
         android:visibility="gone"
+        android:padding="24dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Content Scroll -->
+        <TextView
+            android:id="@+id/emptyTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You have no orders yet!"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/backToHomeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back to Home"
+            android:backgroundTint="@color/orange"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <!-- Nội dung chính (scrollable) -->
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
@@ -34,7 +54,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Header with back, search, settings -->
+            <!-- Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,10 +87,9 @@
                     android:layout_height="48dp"
                     android:padding="8dp"
                     android:src="@drawable/settings_icon" />
-
             </LinearLayout>
 
-            <!-- Cart items list -->
+            <!-- Danh sách giỏ hàng -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/cartView"
                 android:layout_width="match_parent"
@@ -78,7 +97,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Summary -->
+            <!-- Tóm tắt đơn hàng -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -176,10 +195,9 @@
                     app:layout_constraintTop_toBottomOf="@id/view"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginTop="16dp" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Checkout button -->
+            <!-- Nút Check out -->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnCheckout"
                 android:layout_width="match_parent"
@@ -190,8 +208,6 @@
                 android:text="Check out"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
-
         </LinearLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

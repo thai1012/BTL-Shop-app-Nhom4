@@ -2,7 +2,8 @@ package com.example.shopapp.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;                       // <-- thêm import này
+import android.view.View;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.shopapp.Adapter.CartAdapter;
 import com.example.shopapp.Helper.ChangeNumberItemsListener;
 import com.example.shopapp.Helper.ManagmentCart;
-import com.example.shopapp.R;
 import com.example.shopapp.databinding.ActivityCartBinding;
 
 public class CartActivity extends AppCompatActivity {
@@ -21,56 +21,63 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Edge-to-edge UI
         EdgeToEdge.enable(this);
 
-        // Inflate layout via ViewBinding
         binding = ActivityCartBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Setup management and UI
         managmentCart = new ManagmentCart(this);
-        setupBackButton();
-        setupCheckoutButton();
+
+        setupButtons();
         initCartList();
         calculateCart();
     }
 
-    private void setupBackButton() {
+    private void setupButtons() {
+        // Nút back
         binding.backBtn.setOnClickListener(v -> finish());
-    }
 
-    private void setupCheckoutButton() {
+        // Nút checkout
         binding.btnCheckout.setOnClickListener(v -> {
-            // Launch success screen
             startActivity(new Intent(CartActivity.this, OrderSuccessActivity.class));
+            finish();
+        });
+
+        // Nút "Back to Home" khi giỏ hàng rỗng
+        binding.backToHomeBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(CartActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
             finish();
         });
     }
 
     private void initCartList() {
         if (managmentCart.getListCart().isEmpty()) {
-            binding.emptyTxt.setVisibility(View.VISIBLE);
+            // Hiển thị giao diện trống
+            binding.emptyLayout.setVisibility(View.VISIBLE);
             binding.scrollView2.setVisibility(View.GONE);
         } else {
-            binding.emptyTxt.setVisibility(View.GONE);
+            // Hiển thị danh sách giỏ hàng
+            binding.emptyLayout.setVisibility(View.GONE);
             binding.scrollView2.setVisibility(View.VISIBLE);
-        }
-        binding.cartView.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        );
-        binding.cartView.setAdapter(
-                new CartAdapter(
-                        managmentCart.getListCart(),
-                        this,
-                        new ChangeNumberItemsListener() {
-                            @Override
-                            public void changed() {
-                                calculateCart();
+
+            binding.cartView.setLayoutManager(
+                    new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            );
+            binding.cartView.setAdapter(
+                    new CartAdapter(
+                            managmentCart.getListCart(),
+                            this,
+                            new ChangeNumberItemsListener() {
+                                @Override
+                                public void changed() {
+                                    calculateCart();
+                                }
                             }
-                        }
-                )
-        );
+                    )
+            );
+        }
     }
 
     private void calculateCart() {
@@ -82,8 +89,8 @@ public class CartActivity extends AppCompatActivity {
         double total = Math.round((subtotal + tax + delivery) * 100.0) / 100.0;
 
         binding.totalFeeTxt.setText("$" + subtotal);
-        binding.taxTxt     .setText("$" + tax);
+        binding.taxTxt.setText("$" + tax);
         binding.deliveryTxt.setText("$" + delivery);
-        binding.totalTxt   .setText("$" + total);
+        binding.totalTxt.setText("$" + total);
     }
 }
