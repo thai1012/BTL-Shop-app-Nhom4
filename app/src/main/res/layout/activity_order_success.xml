@@ -33,7 +33,7 @@
         android:id="@+id/btnHome"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:text="Về trang chủ"
+        android:text="Back to home"
         android:textSize="16sp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
