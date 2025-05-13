@@ -20,7 +20,7 @@
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cảm ơn quý khách đã đặt hàng!"
+        android:text="Thank you for your order!"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/black"
