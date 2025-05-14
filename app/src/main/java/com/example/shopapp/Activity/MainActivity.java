@@ -39,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
         initSlider();
         initPopular();
         setupBottomNavigation();
+
+        binding.imageView2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+            }
+        });
+
     }
 
     private void setupBottomNavigation() {
@@ -51,7 +59,10 @@ public class MainActivity extends AppCompatActivity {
                     // Đang ở MainActivity
                 } else if (id == R.id.profile) {
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                } else if (id == R.id.cart) {
+                    startActivity(new Intent(MainActivity.this, CartActivity.class));
                 }
+
             }
         });
 
